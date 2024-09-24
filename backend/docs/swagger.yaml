@@ -1,0 +1,776 @@
+basePath: /
+definitions:
+  models.Asset:
+    properties:
+      file_path:
+        type: string
+      id:
+        type: integer
+      task_id:
+        type: integer
+      uploaded_at:
+        type: string
+      uploaded_by:
+        type: integer
+    type: object
+  models.AssetResponse:
+    properties:
+      file_path:
+        type: string
+      id:
+        type: integer
+    type: object
+  models.Comment:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      task_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - content
+    type: object
+  models.CreateTaskInput:
+    properties:
+      assigned_to:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      due_date:
+        type: string
+      priority:
+        enum:
+        - high
+        - medium
+        - normal
+        - low
+        type: string
+      status:
+        enum:
+        - todo
+        - in_progress
+        - completed
+        type: string
+      title:
+        type: string
+    required:
+    - due_date
+    - title
+    type: object
+  models.DashboardResponse:
+    properties:
+      completed:
+        type: integer
+      in_progress:
+        type: integer
+      todo:
+        type: integer
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.RegisterInput:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  models.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.SubTask:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      priority:
+        enum:
+        - high
+        - medium
+        - normal
+        - low
+        type: string
+      status:
+        enum:
+        - todo
+        - in_progress
+        - completed
+        type: string
+      task_id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - due_date
+    - title
+    type: object
+  models.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Task:
+    properties:
+      assets:
+        items:
+          $ref: '#/definitions/models.Asset'
+        type: array
+      assigned_to:
+        items:
+          $ref: '#/definitions/models.TaskAssignment'
+        type: array
+      comments:
+        items:
+          $ref: '#/definitions/models.Comment'
+        type: array
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      creator:
+        $ref: '#/definitions/models.User'
+      description:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: integer
+      priority:
+        enum:
+        - high
+        - medium
+        - normal
+        - low
+        type: string
+      status:
+        enum:
+        - todo
+        - in_progress
+        - completed
+        type: string
+      sub_tasks:
+        items:
+          $ref: '#/definitions/models.SubTask'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - due_date
+    - title
+    type: object
+  models.TaskAssignment:
+    properties:
+      id:
+        type: integer
+      task_id:
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
+    type: object
+  models.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  models.UpdateProfileInput:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    type: object
+  models.UpdateTaskInput:
+    properties:
+      assigned_to:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      due_date:
+        type: string
+      priority:
+        enum:
+        - high
+        - medium
+        - normal
+        - low
+        type: string
+      status:
+        enum:
+        - todo
+        - in_progress
+        - completed
+        type: string
+      title:
+        type: string
+    required:
+    - due_date
+    type: object
+  models.UpdateUserStatusRequest:
+    properties:
+      is_active:
+        type: boolean
+    required:
+    - is_active
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      role:
+        $ref: '#/definitions/models.Role'
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - username
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://www.example.com/support
+  description: API untuk mengelola proyek dan tugas.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: Project Management API
+  version: "1.0"
+paths:
+  /api/admin/users:
+    get:
+      description: Mengambil daftar semua pengguna dengan peran mereka
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil daftar semua pengguna
+      tags:
+      - Admin - User Management
+  /api/admin/users/{id}:
+    delete:
+      description: Menghapus pengguna berdasarkan ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Menghapus pengguna berdasarkan ID
+      tags:
+      - Admin - User Management
+  /api/admin/users/{id}/status:
+    put:
+      description: Memperbarui status aktif (is_active) pengguna berdasarkan ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Status Update
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Memperbarui status aktif pengguna berdasarkan ID
+      tags:
+      - Admin - User Management
+  /api/tasks:
+    get:
+      description: Mengambil daftar tugas yang ditugaskan atau dibuat oleh pengguna
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil daftar tugas
+      tags:
+      - Tasks
+    post:
+      consumes:
+      - application/json
+      description: Membuat tugas baru dalam sistem
+      parameters:
+      - description: Create Task
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Membuat tugas baru
+      tags:
+      - Tasks
+  /api/tasks/{id}:
+    delete:
+      description: Menghapus tugas berdasarkan ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Menghapus tugas
+      tags:
+      - Tasks
+    get:
+      description: Mengambil detail tugas berdasarkan ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil detail tugas
+      tags:
+      - Tasks
+    put:
+      description: Memperbarui informasi tugas berdasarkan ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Task
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateTaskInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Memperbarui tugas
+      tags:
+      - Tasks
+  /api/tasks/{id}/assets:
+    get:
+      description: Mengambil semua aset yang terkait dengan tugas berdasarkan ID tugas
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AssetResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil semua aset terkait tugas
+      tags:
+      - Assets
+    post:
+      description: Mengunggah file aset dan mengaitkannya dengan tugas berdasarkan
+        ID tugas
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.AssetResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengunggah aset ke tugas
+      tags:
+      - Assets
+  /dashboard:
+    get:
+      description: Mengambil jumlah tugas berdasarkan status (todo, in_progress, completed)
+        untuk pengguna yang sedang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DashboardResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil data dashboard pengguna
+      tags:
+      - Dashboard
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Mengautentikasi pengguna dan menghasilkan token JWT
+      parameters:
+      - description: Login Input
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login pengguna
+      tags:
+      - Auth
+  /profile:
+    get:
+      description: Mengambil profil pengguna yang sedang login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Mengambil profil pengguna
+      tags:
+      - Profile
+    put:
+      description: Memperbarui informasi profil pengguna yang sedang login
+      parameters:
+      - description: Update Profile
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateProfileInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Memperbarui profil pengguna
+      tags:
+      - Profile
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Mendaftarkan pengguna baru ke sistem
+      parameters:
+      - description: Register Input
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Registrasi pengguna baru
+      tags:
+      - Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
